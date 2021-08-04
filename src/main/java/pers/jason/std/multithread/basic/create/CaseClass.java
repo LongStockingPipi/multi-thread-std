@@ -85,7 +85,29 @@ public class CaseClass extends BaseCase {
       e.printStackTrace();
     }
 
+    /* 8. CompletableFuture方式 */
+    /* 参考：https://www.liaoxuefeng.com/wiki/1252599548343744/1306581182447650 */
+    CompletableFuture<String> completableFuture = CompletableFuture.supplyAsync(CaseClass::runBatch);
+    completableFuture.thenAccept((res) -> System.out.println("执行结果：" + res));
+    completableFuture.exceptionally((e) -> {
+      System.out.println("执行失败：" + e.getMessage());
+      return null;
+    });
 
+    /* 9. Fork/Join异步执行 */
+    /* 参考：https://blog.csdn.net/tyrroo/article/details/81390202 */
+
+
+  }
+
+  public static String runBatch() {
+    try {
+      Thread.sleep(2000);
+      return "SUCCESS";
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+      return "FAILURE";
+    }
   }
 
 }
