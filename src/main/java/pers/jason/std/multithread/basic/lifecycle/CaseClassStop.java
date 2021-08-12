@@ -1,5 +1,8 @@
 package pers.jason.std.multithread.basic.lifecycle;
 
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+
 /**
  * @author Jason
  * @date 2021/8/3 21:16
@@ -32,6 +35,14 @@ public class CaseClassStop {
    *
    *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    *
+   *  static boolean interrupted()
+   *  该方法可以检测线程是否被中断，但是检测返回结果之后会将中断状态还原（设置为false，即未中断）
+   *
+   *  boolean isInterrupted()
+   *  该方法可以检测线程是否被中断，但不会清除中断状态
+   *
+   *  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   *
    *  可以响应中断的方法：
    *  Object.wait()
    *  Object.wait(long)
@@ -53,8 +64,65 @@ public class CaseClassStop {
    * @param args
    */
   public static void main(String[] args) {
-    BaseTask task = new Task4();
-    task.runTask(task, 5000);
+//    BaseTask task = new Task4();
+//    task.runTask(task, 5000);
+
+//    Thread task = new Thread(new Task5());
+//    task.start();
+//    try {
+//      Thread.sleep(1000);
+//    } catch (InterruptedException e) {
+//      e.printStackTrace();
+//    }
+//    task.stop();
+
+    //-----------------------------------------------
+
+//    BlockingQueue queue = new ArrayBlockingQueue(10);
+//    Producer producer = new Producer(queue);
+//    Consumer consumer = new Consumer(queue);
+//    Thread thread = new Thread(producer);
+//
+//    thread.start();
+//
+//    try {
+//      Thread.sleep(1000);
+//    } catch (InterruptedException e) {
+//      e.printStackTrace();
+//    }
+//
+//    //消费者需要消费20个任务
+//    for(int i=0;i<20;i++) {
+//      consumer.analyse();
+//    }
+//
+//    System.out.println("消费者停止工作");
+//    producer.canceled = true;
+//    System.out.println("生产者停止工作");
+
+    //-----------------------------------------------
+
+    Thread thread = new Thread(() -> {
+      int i=0;
+      while(i<2) {
+        try {
+          Thread.sleep(10000);
+          System.out.println(i);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        } finally {
+          i++;
+        }
+      }
+    });
+    thread.start();
+
+    thread.interrupt();
+
+    System.out.println(thread.isInterrupted());
+    System.out.println(thread.interrupted());
+    System.out.println(Thread.interrupted());
+    System.out.println(thread.isInterrupted());
   }
 
   static abstract class BaseTask implements Runnable {
@@ -179,4 +247,80 @@ public class CaseClassStop {
 
     }
   }
+
+  /**
+   * 错误的停止线程方式1：
+   * 不应该使用Thread.stop()停止线程，因为stop()本质是不安全的。
+   */
+  static class Task5 extends BaseTask {
+
+    @Override
+    public void run() {
+      for(int i=0;i<5;i++) {
+        System.out.println("第"+i+"组计数开始:");
+        for(int j=0;j<10;j++) {
+          System.out.print(" " + j);
+          try {
+            Thread.sleep(80);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          }
+        }
+        System.out.println();
+        System.out.println("第"+i+"组计数结束。");
+        System.out.println("- - - - - - - - - - - - - - -");
+      }
+    }
+  }
+
 }
+
+/**
+ * 错误的停止线程方式2：
+ * 当线程处于阻塞状态的时候，使用volatile布尔变量无法停止线程
+ */
+class Producer implements Runnable {
+
+  private BlockingQueue queue;
+
+  public volatile boolean canceled = false;
+
+  public Producer(BlockingQueue queue) {
+    this.queue = queue;
+  }
+
+  @Override
+  public void run() {
+    try {
+      for(int i=0;i<100000 && !canceled;i++) {
+        if(i%100 == 0) {
+          queue.put(i);
+        }
+      }
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    } finally {
+      System.out.println("Producer停止运行");
+    }
+  }
+}
+
+class Consumer {
+
+  private BlockingQueue queue;
+
+  public Consumer(BlockingQueue queue) {
+    this.queue = queue;
+  }
+
+  public void analyse() {
+    try {
+      System.out.println(queue.take());
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+
+}
+
+
