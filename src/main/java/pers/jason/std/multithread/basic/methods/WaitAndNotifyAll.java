@@ -5,9 +5,11 @@ package pers.jason.std.multithread.basic.methods;
  * @date 2021/8/12 23:17
  * @description
  */
-public class WaitNotifyAll {
+public class WaitAndNotifyAll {
 
   private static Object lock = new Object();
+
+  //todo: wait只能释放当前monitor的锁
 
   public static void main(String[] args) {
 

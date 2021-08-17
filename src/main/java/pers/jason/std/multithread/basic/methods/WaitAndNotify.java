@@ -22,6 +22,26 @@ public class WaitAndNotify {
    *    4. 线程自身调用了interrupt()；
    *  notify()：会唤醒单个线程，若有多个线程都在等待，只会随机选取一个；
    *  notifyAll()：将所有等待的线程都唤醒；
+   *
+   *
+   *  特点：
+   *  1. 必须持有monitor；
+   *  2. notify只能唤醒一个线程；
+   *  3. 三个方法都属于Object类；
+   *  4. jdk对于wait-notify有封装：Condition；
+   *  2. 只能唤醒对象本身的锁；
+   *
+   *
+   *  原理：
+   *  monitor本身有入口集和等待集，抢夺锁的线程都会进入入口集中，而调用wait()后的线程会进入等待集中，直到被唤醒才会继续抢锁；
+   *  由于调用notify()也需要持有monitor锁，因此通常被唤醒的线程不会立即得到锁，虽然状态图中WAITING->RUNNABLE，但是实际上通常是WAITING->BLOCKED
+   *
+   *
+   *  面试：
+   *  1. 为什么执行wait需要在同步代码块中
+   *  如果不在同步代码块中，会出现线程直线切换执行，不能保证wait-notify执行顺序，一旦切换到notify()线程，再切换回来执行wait()，则会发生死锁；
+   *  2. 为什么这三个方法是Object类中？
+   *  因为这三个方法是锁级别的操作，锁本身就是一个对象Object，而像sleep等方法是线程级别的操作
    * @param args
    */
   public static void main(String[] args) {
