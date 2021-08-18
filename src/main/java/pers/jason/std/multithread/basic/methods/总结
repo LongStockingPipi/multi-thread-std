@@ -1,0 +1,10 @@
+wait和sleep方法的异同？
+
+相同
+    Wait和sleep方法都可以使线程阻塞，对应线程状态是Waiting或Time_Waiting。
+    wait和sleep方法都可以响应中断Thread.interrupt()。
+不同
+    wait方法的执行必须在同步方法中进行，而sleep则不需要。
+    在同步方法里执行sleep方法时，不会释放monitor锁，但是wait方法会释放monitor锁。
+    sleep方法短暂休眠之后会主动退出阻塞，而没有指定时间的 wait方法则需要被其他线程中断后才能退出阻塞。
+    wait()和notify(),notifyAll()是Object类的方法，sleep()和yield()是Thread类的方法
