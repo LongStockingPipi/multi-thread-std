@@ -55,6 +55,7 @@ Volatile、synchronized、Lock等关键字、工具类的原理都是JMM
     Volatile适用场合：
         1. boolean flag：对于一个线程共享变量始终只有赋值操作。（赋值具有原子性，Volatile具有可见性，因此线程安全）；
         2. 触发器：定义Volatile变量放到业务代码最后，其它线程一旦感知变量变化，则说明线程之前的代码也具有可见性，同样可以让其它线程安全使用；
+                 Synchronized关键字也有这个作用，在退出Synchronized代码块后，Synchronized内部的代码以及其之前的代码都具有可见性。
     Volatile的作用：
         1. 可见性，读入一个Volatile变量之前，需要先使相应的本地缓存失效，这样必须到主内存中读取最新的值；写入一个Volatile变量会立即刷入到主内存。
         2. 禁止指令重排序优化。
@@ -62,3 +63,8 @@ Volatile、synchronized、Lock等关键字、工具类的原理都是JMM
 
 
 3. 原子性
+    一系列曹操作，要么全部执行成功，要么全部执行失败，不会出现执行一半的情况。
+    Java中的原子操作：
+        1. 除了long、double之外的基本类型赋值；
+        2. 所有引用类型（reference）的赋值操作（无论机器是32位还是64位）；
+        3. java.concurrent.Atomic.*下的所有类的原子操作；
