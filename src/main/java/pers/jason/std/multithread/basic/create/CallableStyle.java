@@ -6,6 +6,10 @@ import java.util.concurrent.Callable;
  * @author Jason
  * @date 2021/8/2 22:37
  * @description
+ *
+ * Callable接口相比于Runnable接口的特点：
+ *  1. 有返回值
+ *  2. 可以抛出异常
  */
 public class CallableStyle implements Callable<String> {
 
